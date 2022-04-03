@@ -1,0 +1,48 @@
+/etc/rc.d/K50dropbear stop
+
+cd /etc/dropbear/
+rm dropbear_rsa_host_key 
+rm dropbear_dss_host_key 
+
+#dropbearkey -t rsa -f dropbear_rsa_host_key
+#dropbearkey -t dss -f dropbear_dss_host_key
+
+openssl enc -base64 -d <<EOF >dropbear_rsa_host_key
+AAAAB3NzaC1yc2EAAAADAQABAAABAQCLZrwphLiFg+Uglmov69ch8CHOoQe3K5AI
+z/kpb6es5WRsFTCcN9qM4KWcnDZRQ5Cnx5sJNJZDmPglGkA92D97zlLYEyD+7olP
+CrjYxpqPspIP0ScJmor/A2HFiSznhST/ClB9zAFANf1su9Y4VwFo35NYsdnDFeeA
+WKwAJLOFfQsWOSHJp08ocWnForpOpIenlUEH2BQH5EI9C7FEV9ce9+Bds/s0F5k9
+B7EK/Mx4bNr1o5EZMtKcWA9OMbs/gn4dzLTX01z0Zm11TOHP7E3mhjVP4rwy5zn2
+Y6jouHjIYj9AnVpmA/bDak23XI5xmo+iKldrfDamsS+G/uh9/y3XAAABAEJD9Gci
+HZruT1F13wVnrU0HOvLf7mx+q0ndHxq45nKUWu/cBM8F6AC221L+mP15Sj7Pbl3q
+XxHEGhV9DJO5g7gFJLFtKm61EpV9yc/WXOu5HaCiMlXo3nEJ+QSvSCbIToVkME4U
+V3XgFFeHVPZUOanSOddcN+F6PKFwxVaOG750rkw5K8XhZ5em1O+K/F5zVziOPDUX
+rL4GCvGcWSvasRUCUZzDgsGJLgSdJs+AgrX5LSE5CWXttOCKrH4xdYwFWsLeQRPK
+Eb8jt5dD+hgYpPvcAdjFVxyDsxrN0xLmZ4PiWoxvtUMRY+Pmjacf3rigP99iCsDe
+65hW9IEMPB28rW0AAACBAP67GDrZXs0Kmdje/l5Hf+NBQ+cqzkevqSgxAja5MmsD
+2ojYp+tz6rKBYd3xaYH9HfJxtwf86dsjkl2ml+NarOL95uF8N5SqZ6DqWKH8P/YU
+hFx4cK9gOBnrniZJyVVdwXtqDDYKAmh95d+1vHEXV5Ft9YjrwjMgJZZ88LgC7XPb
+AAAAgQCMGIoOR2PbHUitbsWO85WEzPUPPR7ze31BiMuAPIxREbCqhMVUjvlxk1HQ
+nOYRIftwfkCrDoc9U1y6oh3CTYp/MBPgUPhNL9srsSGn1FdJ17GXIQntvv4hUNRP
+jEoBvDgpl25GKdVpj+jf1glD9TVxSpIQg5EaleMA0hKVlmoMtQ==
+EOF
+
+mkdir -p /.ssh
+cd /.ssh
+## NOTE: if you don't know how to generate a valid 'authorized_keys' file of your own, PLEASE DO NOT ASK ME !!! i won't reply
+echo "ssh-rsa ==================================>YOUR PUBLIC RSA KEY HERE<=================================" >authorized_keys
+
+echo "/bin/sh" >>/etc/shells
+
+cd /
+
+# debug dropbear issues at this stage with:
+# dropbear -b /etc/banner -p 22 -B -a -F -E
+
+# respawn if dead, log to syslog:
+#{ while :; do dropbear -b /etc/banner -p 22 -B -a -F; sleep 1; done; } &
+{ while :; do dropbear -p 22 -B -a -F; sleep 1; done; } &
+
+# now access from elsewhere with:
+# ssh root@192.168.1.1
+
