@@ -9,6 +9,7 @@ BAK_FILE="${BAK_NAME}.tar"
 mkdir -p "$TMP_DIR/$BAK_NAME"
 rm -f "$TMP_DIR/$BAK_FILE"
 
+ubiattach -m 11 || true
 ubiattach -m 21 || true
 
 echo
@@ -33,4 +34,5 @@ rm -rf "../$BAK_NAME"
 echo
 
 ubidetach -m 21 || true
+ubidetach -m 11 || true
 
