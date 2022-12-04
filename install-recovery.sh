@@ -1,5 +1,30 @@
 set -e
 
+echo
+if [[ "$(cat /sys/class/mtd/mtd11/name)" == "rootfs" ]]; then
+	echo "currently active OS slot: primary OS slot (mtd11)"
+elif [[ "$(cat /sys/class/mtd/mtd21/name)" == "rootfs" ]]; then
+	echo "currently active OS slot: secondary OS slot (mtd21)"
+	echo
+	echo "OpenWrt installation on this router requires relocating the critical fw_env partition"
+	echo "to consolidate free space, which involves overwriting the secondary OS slot (mtd21)."
+	echo "installation cannot proceed because the OS is currently running from this slot."
+	echo
+	echo "recommended steps:"
+	echo "1) copy currently running OS from secondary slot (mtd21) to primary slot (mtd11)."
+	echo "2) switch active OS slot to primary:"
+	echo "   a) make sure the contents of 0:BOOTCONFIG (mtd12) are valid."
+	echo "   b) set the 'age' field of 0:BOOTCONFIG1 (mtd19) to zero."
+	echo "      age is the second 32-bit word of the partition (byte offsets 4 though 7)."
+	echo "3) reboot and retry the installation."
+	echo
+	echo "error: secondary OS slot is currently active"
+	exit 1
+else
+	echo "error: could not determine currently active OS slot"
+	exit 1
+fi
+
 if [[ "$1" != "-f" ]]; then
 	echo
 	echo "checking current firmware version (-f to disable check)"
