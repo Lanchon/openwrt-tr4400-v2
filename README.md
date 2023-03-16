@@ -8,6 +8,10 @@
 - Serial port terminal software (eg: gtkterm).
 - SSH and SCP client software with configued keys.
 
+**Note:** While issuing the SCP commands detailed bellow, you might encounter errors related to option `-O` not being recongnized. In such a case, simply leave out the `-O` option from all SCP commnands.
+This happens if you are using an SCP version older than 8.7 (use `ssh -V` to check your version). The option is required on recent SCP versions due to deprecation of the old SCP/RCP protocol. 
+More details [here](https://github.com/Lanchon/openwrt-rt4230w-rev6/pull/3#issuecomment-1472474007).
+
 ### Preparation
 
 1. Clone this repository.
@@ -59,13 +63,13 @@ Save the output and seek help in the forums instead.
 1. Create and transfer backups of all MTD partitions:
 ```
 ssh root@192.168.1.1 sh <mtd-backup.sh
-scp root@192.168.1.1:/tmp/lanchon/mtd-backup.tar .
+scp -O root@192.168.1.1:/tmp/lanchon/mtd-backup.tar .
 ssh root@192.168.1.1 "rm /tmp/lanchon/mtd-backup.tar"
 ```
 2. Create and transfer backups of all UBI volumes:
 ```
 ssh root@192.168.1.1 sh <ubi-backup.sh
-scp root@192.168.1.1:/tmp/lanchon/ubi-backup.tar .
+scp -O root@192.168.1.1:/tmp/lanchon/ubi-backup.tar .
 ssh root@192.168.1.1 "rm /tmp/lanchon/ubi-backup.tar"
 ```
 - You might need these backups down the road, so store them.
@@ -76,7 +80,7 @@ Make sure you have backups of the stock firmware (see previous section); each de
 
 1. Install the initramfs recovery image:
 ```
-scp openwrt-[...]-arris_tr4400-v2-initramfs-uImage root@192.168.1.1:/tmp/recovery.bin
+scp -O openwrt-[...]-arris_tr4400-v2-initramfs-uImage root@192.168.1.1:/tmp/recovery.bin
 ssh root@192.168.1.1 sh <install-recovery.sh
 ```
 2. Sysupgrade to the squashfs image:
@@ -91,7 +95,7 @@ There is usually no reason to upgrade the recovery image. This is provided for c
 1. [Download](https://firmware-selector.openwrt.org/?target=ipq806x%2Fgeneric&id=arris_tr4400-v2) the OpenWrt initramfs (kernel) image for this router.
 2. Pop up a terminal and write the recovery image (replace 192.168.1.1 with the address of your router):
 ```
-scp openwrt-[...]-arris_tr4400-v2-initramfs-uImage root@192.168.1.1:/tmp/recovery.bin
+scp -O openwrt-[...]-arris_tr4400-v2-initramfs-uImage root@192.168.1.1:/tmp/recovery.bin
 ssh root@192.168.1.1 'ubiupdatevol /dev/ubi0_9 /tmp/recovery.bin && rm /tmp/recovery.bin'
 ```
 
