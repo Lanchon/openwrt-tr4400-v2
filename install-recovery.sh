@@ -47,7 +47,7 @@ echo "checking status of new fw_env partition"
 if [[ "$(head -c 4 /dev/mtd21)" == "UBI#" ]]; then
 	echo "stock ubi partition found, data copy from stock fw_env needed"
 	echo "verifying contents of stock fw_env partition"
-	head -c 512 /dev/mtd22 | strings | grep MySpectrumWiFi
+	head -c 512 /dev/mtd22 | strings | grep -e MySpectrumWiFi -e SpectrumSetup
 	echo "attempting backup of fw_env data"
 	if ubimkvol /dev/ubi0 -N fw_env_backup -n 8 -s 126976; then
 		dd if=/dev/mtd22 bs=126976 count=1 | ubiupdatevol -s 126976 /dev/ubi0_8 -
@@ -58,10 +58,10 @@ else
 	echo "custom non-ubi partition found"
 fi
 echo "verifying contents of new fw_env partition"
-head -c 512 /dev/mtd21 | strings | grep MySpectrumWiFi
+head -c 512 /dev/mtd21 | strings | grep -e MySpectrumWiFi -e SpectrumSetup
 
 # NOTE: to revert the move use:
-#head -c 512 /dev/mtd21 | strings | grep MySpectrumWiFi && mtd erase /dev/mtd22 && dd if=/dev/mtd21 bs=128K count=1 | mtd write - /dev/mtd22
+#head -c 512 /dev/mtd21 | strings | grep -e MySpectrumWiFi -e SpectrumSetup && mtd erase /dev/mtd22 && dd if=/dev/mtd21 bs=128K count=1 | mtd write - /dev/mtd22
 
 echo
 echo "checking status of config ubi partition"
